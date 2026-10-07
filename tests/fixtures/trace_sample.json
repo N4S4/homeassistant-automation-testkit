@@ -1,0 +1,122 @@
+{
+  "domain": "automation",
+  "item_id": "1740010526002",
+  "run_id": "61dd6561636f1c37e56f62c782272064",
+  "summary": {
+    "last_step": "action/0",
+    "run_id": "61dd6561636f1c37e56f62c782272064",
+    "state": "stopped",
+    "script_execution": "error",
+    "timestamp": {
+      "start": "2026-10-07T04:57:43.847175+00:00",
+      "finish": "2026-10-07T04:57:43.847750+00:00"
+    },
+    "domain": "automation",
+    "item_id": "1740010526002",
+    "error": "Theme waves not found at 'name'",
+    "trigger": "Home Assistant starting"
+  },
+  "trace": {
+    "last_step": "action/0",
+    "run_id": "61dd6561636f1c37e56f62c782272064",
+    "state": "stopped",
+    "script_execution": "error",
+    "timestamp": {
+      "start": "2026-10-07T04:57:43.847175+00:00",
+      "finish": "2026-10-07T04:57:43.847750+00:00"
+    },
+    "domain": "automation",
+    "item_id": "1740010526002",
+    "error": "Theme waves not found at 'name'",
+    "trigger": "Home Assistant starting",
+    "trace": {
+      "trigger/0": [
+        {
+          "path": "trigger/0",
+          "timestamp": "2026-10-07T04:57:43.847218+00:00",
+          "changed_variables": {
+            "this": {
+              "entity_id": "automation.theme_set_defaulth_theme",
+              "state": "on",
+              "attributes": {
+                "id": "1740010526002",
+                "last_triggered": "2026-10-02T16:36:16.674700+00:00",
+                "mode": "single",
+                "current": 0,
+                "friendly_name": "Theme - Set Defaulth Theme"
+              },
+              "last_changed": "2026-10-07T04:57:16.457587+00:00",
+              "last_reported": "2026-10-07T04:57:16.457587+00:00",
+              "last_updated": "2026-10-07T04:57:16.457587+00:00",
+              "context": {
+                "id": "01M4ABJ5D94ZNYG7EC79BF2WMC",
+                "parent_id": null,
+                "user_id": null
+              }
+            },
+            "trigger": {
+              "id": "0",
+              "idx": "0",
+              "alias": null,
+              "platform": "homeassistant",
+              "event": "start",
+              "description": "Home Assistant starting"
+            }
+          }
+        }
+      ],
+      "action/0": [
+        {
+          "path": "action/0",
+          "timestamp": "2026-10-07T04:57:43.847374+00:00",
+          "changed_variables": {
+            "context": {
+              "id": "01M4ABK0574SF2EAQR3M9NFV3W",
+              "parent_id": null,
+              "user_id": null
+            }
+          },
+          "error": "Theme waves not found at 'name'",
+          "result": {
+            "params": {
+              "domain": "frontend",
+              "service": "set_theme",
+              "service_data": {
+                "name": "waves"
+              },
+              "target": {}
+            },
+            "running_script": false
+          }
+        }
+      ]
+    },
+    "config": {
+      "id": "1740010526002",
+      "alias": "Theme - Set Defaulth Theme",
+      "description": "",
+      "triggers": [
+        {
+          "trigger": "homeassistant",
+          "event": "start"
+        }
+      ],
+      "conditions": [],
+      "actions": [
+        {
+          "action": "frontend.set_theme",
+          "data": {
+            "name": "waves"
+          }
+        }
+      ],
+      "mode": "single"
+    },
+    "blueprint_inputs": null,
+    "context": {
+      "id": "01M4ABK0574SF2EAQR3M9NFV3W",
+      "parent_id": null,
+      "user_id": null
+    }
+  }
+}

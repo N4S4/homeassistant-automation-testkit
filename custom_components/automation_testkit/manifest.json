@@ -1,0 +1,12 @@
+{
+  "domain": "automation_testkit",
+  "name": "Automation Test Kit",
+  "codeowners": ["@N4S4"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/N4S4/homeassistant-automation-testkit",
+  "integration_type": "service",
+  "issue_tracker": "https://github.com/N4S4/homeassistant-automation-testkit/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}
