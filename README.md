@@ -1,8 +1,10 @@
 # Automation Test Kit
 
-A native Home Assistant integration for testing automations without waiting for
-the real trigger. Inspect past runs, replay actions, simulate a trigger in
-isolation, and dry-run the whole pipeline without touching a single device.
+<p align="center">
+  <img src="icon.png" alt="Automation Test Kit logo" width="128" height="128" />
+</p>
+
+Test your automations without waiting for them to misbehave.
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg?style=for-the-badge)](LICENSE)
@@ -15,25 +17,32 @@ isolation, and dry-run the whole pipeline without touching a single device.
 
 ---
 
-## Features
+Automations are optimistic by nature: "when this happens, do that." Some keep
+the promise. The rest wait for the worst possible moment to break it, usually
+while you sleep.
 
-- **Browse** your automations and their recorded trace runs.
+**Automation Test Kit** is a native Home Assistant panel that lets you read
+those promises and, better, verify them, before reality gets the chance to.
+No waiting for the real trigger, no guessing, no 3 AM surprises.
+
+## What you can do
+
+- **Browse** automations and their recorded trace runs.
 - **Inspect** triggers, conditions and actions from a saved trace.
 - **Replay** an automation's actions without waiting for the real trigger.
 - **Simulate** a trigger in isolation. It injects a reconstructed trigger
-  variable so the full pipeline runs (trigger → conditions → actions), without
+  variable and runs the full pipeline (trigger → conditions → actions), without
   waking any other automation.
-- **Simulate never-run automations**. Synthetic triggers are built from the
-  config, so even an automation with no recorded trace can be tested.
+- **Simulate never-run automations**. Synthetic triggers are built from config,
+  so even an automation with no trace yet can be tested.
 - **Edit** the trigger variable by hand before injecting it. Change a time, a
   state, event data.
 - **Dry-run** the pipeline. Conditions are evaluated, templates rendered and
-  branches taken, but every service call is intercepted, so no device is
-  touched. You see exactly what *would* change, including **which condition
-  failed** and why.
+  branches taken, but every service call is intercepted. You see what *would*
+  change, including **which condition failed** and why.
 
-A native sidebar panel (no iframe, no external server, no build step), driven
-by Home Assistant's own WebSocket API.
+No iframe, no external server, no build step. Just a sidebar panel driven by
+Home Assistant's own WebSocket API.
 
 ## Installation
 
@@ -54,14 +63,14 @@ cd /path/to/homeassistant/config/custom_components
 git clone https://github.com/N4S4/homeassistant-automation-testkit.git automation_testkit
 ```
 
-Then restart HA and add the integration via the UI.
+Then restart HA and add the integration from the UI.
 
 ## Usage
 
 Open the **Automation Test Kit** panel from the sidebar. Pick an automation to
 see its triggers, conditions and actions, plus every recorded trace run.
 
-Each trigger exposes three actions:
+Each trigger gives you three options:
 
 | Action | What it does |
 |--------|--------------|
@@ -69,7 +78,7 @@ Each trigger exposes three actions:
 | **Dry run** | Same pipeline, but service calls are intercepted. Nothing touches a device. Shows which conditions passed or failed. |
 | **Edit** | Edit the trigger variable as raw JSON, then simulate or dry-run with your value. |
 
-Simulation is **isolated**. It calls the target automation's internal trigger
+Simulation is **isolated**: it calls the target automation's internal trigger
 directly, so no other automation is woken and nothing is fired on the event bus.
 
 ## How it works

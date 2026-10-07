@@ -1,5 +1,8 @@
 {
   "config": {
+    "step": {
+      "user": {}
+    },
     "abort": {
       "single_instance_allowed": "Already configured. Only a single Automation Test Kit instance is allowed."
     }
