@@ -2,7 +2,7 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
-A native Home Assistant panel for testing automations: browse traces, replay actions, simulate triggers in isolation, and dry-run without touching devices.
+A Home Assistant panel for testing automations: browse traces, replay actions, simulate triggers in isolation, and dry-run without touching devices.
 
 [![Add to Home Assistant](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=N4S4&repository=homeassistant-automation-testkit&category=integration)
 
