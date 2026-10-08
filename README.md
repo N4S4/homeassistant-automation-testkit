@@ -21,7 +21,7 @@ Automations are optimistic by nature: "when this happens, do that." Some keep
 the promise. The rest wait for the worst possible moment to break it, usually
 while you sleep.
 
-**Automation Test Kit** is a native Home Assistant panel that lets you read
+**Automation Test Kit** is a Home Assistant panel that lets you read
 those promises and, better, verify them, before reality gets the chance to.
 No waiting for the real trigger, no guessing, no 3 AM surprises.
 
