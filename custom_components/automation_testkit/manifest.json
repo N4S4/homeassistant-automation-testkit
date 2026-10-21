@@ -3,11 +3,11 @@
   "name": "Automation Test Kit",
   "codeowners": ["@N4S4"],
   "config_flow": true,
-  "dependencies": ["http", "trace"],
+  "dependencies": ["http", "trace", "frontend", "websocket_api", "automation"],
   "documentation": "https://github.com/N4S4/homeassistant-automation-testkit",
   "integration_type": "service",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/N4S4/homeassistant-automation-testkit/issues",
   "requirements": [],
-  "version": "1.0.0"
+  "version": "1.0.1"
 }

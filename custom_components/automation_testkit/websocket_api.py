@@ -39,6 +39,7 @@ def async_register_commands(hass: HomeAssistant) -> None:
     websocket_api.async_register_command(hass, ws_dry_run)
 
 
+@websocket_api.require_admin
 @websocket_api.websocket_command(
     {
         vol.Required("type"): f"{DOMAIN}/parse_trace",
@@ -64,6 +65,7 @@ async def ws_parse_trace(
     connection.send_result(msg["id"], result)
 
 
+@websocket_api.require_admin
 @websocket_api.websocket_command(
     {
         vol.Required("type"): f"{DOMAIN}/simulate",
@@ -172,6 +174,7 @@ def build_synthetic_trigger(hass: HomeAssistant, idx: int, cfg: dict) -> dict[st
     return trigger
 
 
+@websocket_api.require_admin
 @websocket_api.websocket_command(
     {
         vol.Required("type"): f"{DOMAIN}/config",
@@ -212,6 +215,7 @@ async def ws_config(
     )
 
 
+@websocket_api.require_admin
 @websocket_api.websocket_command(
     {
         vol.Required("type"): f"{DOMAIN}/dry_run",
