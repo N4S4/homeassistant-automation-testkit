@@ -134,8 +134,8 @@ def build_synthetic_trigger(hass: HomeAssistant, idx: int, cfg: dict) -> dict[st
         trigger["description"] = cfg.get("alias") or f"homeassistant '{ev}'"
         trigger["event"] = ev
     elif platform in ("state", "numeric_state"):
-        entity_id = cfg.get("entity_id", "")
-        cur = hass.states.get(entity_id)
+        entity_id = _pick_entity_id(hass, cfg.get("entity_id", ""))
+        cur = hass.states.get(entity_id) if entity_id else None
         state_val = cur.state if cur else "0"
         to = cfg.get("to")
         if platform == "state" and to is not None:
@@ -174,6 +174,28 @@ def build_synthetic_trigger(hass: HomeAssistant, idx: int, cfg: dict) -> dict[st
     return trigger
 
 
+def _pick_entity_id(hass: HomeAssistant, raw: Any) -> str:
+    """Return a single usable string entity_id from a trigger config value.
+
+    `entity_id` for a state/numeric_state trigger can be a plain string OR a
+    list of strings (a YAML ``NodeListClass``, e.g. ``entity_id: [light.a,
+    light.b]``). Passing the list straight to ``hass.states.get()`` raises
+    ``TypeError: unhashable type 'NodeListClass'``. Prefer the first id that
+    actually has a state so the synthetic trigger is meaningful; otherwise fall
+    back to the first string id, then to "".
+    """
+    if isinstance(raw, str):
+        return raw
+    if isinstance(raw, (list, tuple)):
+        for eid in raw:
+            if isinstance(eid, str) and hass.states.get(eid) is not None:
+                return eid
+        for eid in raw:
+            if isinstance(eid, str):
+                return eid
+    return ""
+
+
 @websocket_api.require_admin
 @websocket_api.websocket_command(
     {
@@ -200,10 +222,20 @@ async def ws_config(
     triggers_cfg = raw.get("triggers", []) or []
     if isinstance(triggers_cfg, dict):
         triggers_cfg = [triggers_cfg]
-    triggers = [
-        build_synthetic_trigger(hass, i, cfg)
-        for i, cfg in enumerate(triggers_cfg)
-    ]
+    triggers: list[dict[str, Any]] = []
+    for i, cfg in enumerate(triggers_cfg):
+        try:
+            triggers.append(build_synthetic_trigger(hass, i, cfg))
+        except Exception:  # noqa: BLE001 — one bad trigger must not break the whole config
+            triggers.append(
+                {
+                    "platform": cfg.get("platform") or cfg.get("trigger") or "unknown",
+                    "id": str(i),
+                    "idx": str(i),
+                    "description": cfg.get("alias") or "unparseable trigger",
+                    "error": "could not build synthetic trigger",
+                }
+            )
 
     connection.send_result(
         msg["id"],
