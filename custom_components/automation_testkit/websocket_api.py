@@ -9,6 +9,7 @@ needs a custom command here.
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import asdict
 from typing import Any
 
@@ -29,6 +30,8 @@ from .parser import (
     parse_trace,
 )
 
+_dry_run_lock = asyncio.Lock()
+
 
 @callback
 def async_register_commands(hass: HomeAssistant) -> None:
@@ -37,6 +40,30 @@ def async_register_commands(hass: HomeAssistant) -> None:
     websocket_api.async_register_command(hass, ws_simulate)
     websocket_api.async_register_command(hass, ws_config)
     websocket_api.async_register_command(hass, ws_dry_run)
+
+
+_COMMAND_TYPES = (
+    f"{DOMAIN}/parse_trace",
+    f"{DOMAIN}/simulate",
+    f"{DOMAIN}/config",
+    f"{DOMAIN}/dry_run",
+)
+
+
+@callback
+def async_unregister_commands(hass: HomeAssistant) -> None:
+    """Unregister the WebSocket commands (on integration unload).
+
+    HA's websocket_api has no public ``async_remove_command``; commands are a
+    plain dict in ``hass.data[websocket_api.DOMAIN]`` keyed by command string.
+    Popping them there stops the commands from being callable after the
+    integration is unloaded, so a reload re-registers cleanly.
+    """
+    handlers = hass.data.get(websocket_api.DOMAIN)
+    if not handlers:
+        return
+    for command in _COMMAND_TYPES:
+        handlers.pop(command, None)
 
 
 @websocket_api.require_admin
@@ -277,44 +304,51 @@ async def ws_dry_run(
         )
         return
 
-    dry_context = Context()
-    calls: list[dict[str, Any]] = []
-    original = ServiceRegistry.async_call
+    if _dry_run_lock.locked():
+        connection.send_error(
+            msg["id"], "busy", "A dry run is already in progress"
+        )
+        return
 
-    async def fake_async_call(
-        self,
-        domain: str,
-        service: str,
-        service_data: dict[str, Any] | None = None,
-        blocking: bool = False,
-        context: Context | None = None,
-        target: dict[str, Any] | None = None,
-        return_response: bool = False,
-    ) -> dict[str, Any] | None:
-        if context is not None and context.parent_id == dry_context.id:
-            calls.append(
-                {
-                    "domain": domain,
-                    "service": service,
-                    "data": service_data,
-                    "target": target,
-                }
+    async with _dry_run_lock:
+        dry_context = Context()
+        calls: list[dict[str, Any]] = []
+        original = ServiceRegistry.async_call
+
+        async def fake_async_call(
+            self,
+            domain: str,
+            service: str,
+            service_data: dict[str, Any] | None = None,
+            blocking: bool = False,
+            context: Context | None = None,
+            target: dict[str, Any] | None = None,
+            return_response: bool = False,
+        ) -> dict[str, Any] | None:
+            if context is not None and context.parent_id == dry_context.id:
+                calls.append(
+                    {
+                        "domain": domain,
+                        "service": service,
+                        "data": service_data,
+                        "target": target,
+                    }
+                )
+                return {} if return_response else None
+            return await original(
+                self, domain, service, service_data, blocking=blocking,
+                context=context, target=target, return_response=return_response,
             )
-            return {} if return_response else None
-        return await original(
-            self, domain, service, service_data, blocking=blocking,
-            context=context, target=target, return_response=return_response,
-        )
 
-    ServiceRegistry.async_call = fake_async_call  # type: ignore[method-assign]
-    try:
-        await entity.async_trigger(
-            {"trigger": msg["trigger"]},
-            context=dry_context,
-            skip_condition=msg["skip_condition"],
-        )
-    finally:
-        ServiceRegistry.async_call = original  # type: ignore[method-assign]
+        ServiceRegistry.async_call = fake_async_call  # type: ignore[method-assign]
+        try:
+            await entity.async_trigger(
+                {"trigger": msg["trigger"]},
+                context=dry_context,
+                skip_condition=msg["skip_condition"],
+            )
+        finally:
+            ServiceRegistry.async_call = original  # type: ignore[method-assign]
 
     script_execution = None
     conditions: list[dict[str, Any]] = []

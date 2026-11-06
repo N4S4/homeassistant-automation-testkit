@@ -526,7 +526,12 @@ class AutomationTestKitPanel extends HTMLElement {
       this._renderDryRunResult(r);
     } catch (err) {
       status.className = "atk-status err";
-      status.textContent = "Dry-run failed: " + this._errText(err);
+      if (err && err.code === "busy") {
+        status.textContent =
+          "A dry run is already in progress. Wait for it to finish, then try again.";
+      } else {
+        status.textContent = "Dry-run failed: " + this._errText(err);
+      }
     }
   }
 

@@ -14,7 +14,7 @@ from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
 from .frontend import async_setup_frontend
-from .websocket_api import async_register_commands
+from .websocket_api import async_register_commands, async_unregister_commands
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -32,13 +32,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Remove the panel on unload."""
+    """Remove the panel and WebSocket commands on unload."""
     from homeassistant.components import frontend
 
     from .const import PANEL_URL_PATH
 
     if hass.data.get(DOMAIN) == entry.entry_id:
         frontend.async_remove_panel(hass, PANEL_URL_PATH)
+        async_unregister_commands(hass)
         hass.data.pop(DOMAIN, None)
 
     return True
